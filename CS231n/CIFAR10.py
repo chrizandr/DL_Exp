@@ -1,6 +1,6 @@
 import cPickle
 import numpy as np
-import pdb
+
 '''
     Function used to unpack the CIFAR-10 dataset
     Parameters : file - full path of the CIFAR-10 data set extracted file (http://www.cs.toronto.edu/~kriz/cifar.html)
@@ -31,7 +31,3 @@ def unpickle(file):
 
 
 # Trying main
-
-path = "/home/chris/Downloads/cifar-10-batches-py/"
-Xtr, Ytr, Xte, Yte = load_Cifar(path)
-pdb.set_trace()
