@@ -242,39 +242,3 @@ class TwoLayerNet(object):
     ###########################################################################
 
     return y_pred
-
-
-    hidden_size = [75, 100, 125]\n",
-
-results = {}
-best_val_acc = 0
-best_net = None
-
-learning_rates = np.array([7e-4, 8e-4, 9e-4, 1e-3, 1.1e-3])
-regularization_strengths = [0.75, 1, 1.25]
-
-print 'running',
-for hs in hidden_size:
-    for lr in learning_rates:
-        for reg in regularization_strengths:
-            print '.',
-            net = TwoLayerNet(input_size, hs, num_classes)
-            # Train the network
-            stats = net.train(X_train, y_train, X_val, y_val,
-            num_iters=1500, batch_size=200,
-            learning_rate=lr, learning_rate_decay=0.95,
-            reg= reg, verbose=False)
-            val_acc = (net.predict(X_val) == y_val).mean()
-            if val_acc > best_val_acc:
-                best_val_acc = val_acc
-                best_net = net
-            results[(hs,lr,reg)] = val_acc
-print
-print "finshed"
-# Print out results.
-for hs,lr, reg in sorted(results):
-    val_acc = results[(hs, lr, reg)]
-    print 'hs %d lr %e reg %e val accuracy: %f' % (hs, lr, reg,  val_acc)
-
-print 'best validation accuracy achieved during cross-validation: %f' % best_val_acc
-# pass\n",
