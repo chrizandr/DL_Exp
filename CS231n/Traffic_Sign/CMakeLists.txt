@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 2.8)
+project( Traffic_Sign )
+find_package( OpenCV REQUIRED )
+add_executable( tsc tsc.cpp )
+target_link_libraries( tsc ${OpenCV_LIBS} )
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} )
+SET(GCC_COVERAGE_COMPILE_FLAGS "-std=c++11")
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )

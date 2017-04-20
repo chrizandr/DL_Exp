@@ -1,7 +1,7 @@
 #include "tiny_dnn/tiny_dnn.h" // order matters, this has to go before opencv (ACCESS_WRITE)
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include <glob.h>
+// #include <glob.h>
 
 using namespace cv;
 using namespace std;
