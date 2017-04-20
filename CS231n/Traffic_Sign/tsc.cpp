@@ -1,6 +1,7 @@
 #include "tiny_dnn/tiny_dnn.h" // order matters, this has to go before opencv (ACCESS_WRITE)
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <glob.h>
 
 using namespace cv;
 using namespace std;
@@ -65,11 +66,12 @@ void add_image(const Mat &image, int lab, cv::Mat &data, cv::Mat &labels)
 template<class Datatype, class Labelstype>
 double load(const String &dir, Datatype &data, Labelstype &labels, int max_classes=-1, bool gray=true, int skip=0)
 {
-    int64 t0 = getTickCount();
+    // int64 t0 = getTickCount();
     int k = 0;
     vector<String> csvs;
     glob(dir + "*.csv", csvs, true);
     for (auto cn : csvs) {
+        printf("%s\n", cn );
         ifstream csv(cn);
         string file;
         getline(csv, file); // skip csv header
@@ -101,8 +103,8 @@ double load(const String &dir, Datatype &data, Labelstype &labels, int max_class
             add_image(resized, label, data, labels);
         }
     }
-    int64 t1 = getTickCount();
-    return  ((t1-t0)/getTickFrequency());
+    // int64 t1 = getTickCount();
+    // return  ((t1-t0)/getTickFrequency());
 }
 
 
@@ -282,70 +284,70 @@ void cv_load(const String &dir, Mat &data, Mat &labels, int max_classes, const S
 
 using tiny_dnn::timer;
 
-int cv_svm(int max_classes)
-{
-    Ptr<ml::SVM> svm = ml::SVM::create();
-    svm->setKernel(ml::SVM::LINEAR);
+// int cv_svm(int max_classes)
+// {
+//     Ptr<ml::SVM> svm = ml::SVM::create();
+//     svm->setKernel(ml::SVM::LINEAR);
+//
+//     Mat data, labels;
+//     cv_load("Training/", data, labels, max_classes, "svm train ");
+//
+//     timer t;
+//     svm->train(data, 0, labels);
+//     double t1 = t.elapsed();
+//
+//     cv_load("Testing/", data, labels, max_classes, "svm test  ");
+//
+//     t.restart();
+//     Mat results;
+//     svm->predict(data, results);
+//     double t2 = t.elapsed();
+//
+//     cout << "svm " << t1 << " / " << t2 << " seconds." << endl;
+//     cv_results(max_classes, results, labels, "svm ");
+//     return 0;
+// }
 
-    Mat data, labels;
-    cv_load("Training/", data, labels, max_classes, "svm train ");
-
-    timer t;
-    svm->train(data, 0, labels);
-    double t1 = t.elapsed();
-
-    cv_load("Testing/", data, labels, max_classes, "svm test  ");
-
-    t.restart();
-    Mat results;
-    svm->predict(data, results);
-    double t2 = t.elapsed();
-
-    cout << "svm " << t1 << " / " << t2 << " seconds." << endl;
-    cv_results(max_classes, results, labels, "svm ");
-    return 0;
-}
-
-
-int cv_mlp(int max_classes)
-{
-    Mat_<int> layers(4, 1);
-    layers << WINSIZE*WINSIZE, 400, 100, max_classes;
-
-    Ptr<ml::ANN_MLP> nn = ml::ANN_MLP::create();
-    nn->setLayerSizes(layers);
-    nn->setTrainMethod(ml::ANN_MLP::BACKPROP, 0.0001);
-    nn->setActivationFunction(ml::ANN_MLP::SIGMOID_SYM);
-    nn->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER+TermCriteria::EPS, 300, 0.0001));
-
-    Mat data, labels;
-    cv_load("Training/", data, labels, max_classes, "mlp train ");
-
-    // mlp needs "one-hot" encoded responses for training
-    Mat hot(labels.rows, max_classes, CV_32F, 0.0f);
-    for (int i=0; i<labels.rows; i++)
-    {
-        int id = (int)labels.at<int>(i);
-        hot.at<float>(i, id) = 1.0f;
-    }
-    timer t;
-    nn->train(data, 0, hot);
-    double t1 = t.elapsed();
-
-    cv_load("Testing/", data, labels, max_classes, "mlp test  ");
-    t.restart();
-    Mat results;
-    // doing single predictions is slower, but this avoids having to unroll the result
-    for (int r=0; r<data.rows; r++) {
-        float p = nn->predict(data.row(r));
-        results.push_back(p);
-    }
-    double t2 = t.elapsed();
-    cout << "mlp " << t1 << " / " << t2 << " seconds." << endl;
-
-    cv_results(max_classes, results, labels, "mlp ");
-    return 0;
-}
+//
+// int cv_mlp(int max_classes)
+// {
+//     Mat_<int> layers(4, 1);
+//     layers << WINSIZE*WINSIZE, 400, 100, max_classes;
+//
+//     Ptr<ml::ANN_MLP> nn = ml::ANN_MLP::create();
+//     nn->setLayerSizes(layers);
+//     nn->setTrainMethod(ml::ANN_MLP::BACKPROP, 0.0001);
+//     nn->setActivationFunction(ml::ANN_MLP::SIGMOID_SYM);
+//     nn->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER+TermCriteria::EPS, 300, 0.0001));
+//
+//     Mat data, labels;
+//     cv_load("Training/", data, labels, max_classes, "mlp train ");
+//
+//     // mlp needs "one-hot" encoded responses for training
+//     Mat hot(labels.rows, max_classes, CV_32F, 0.0f);
+//     for (int i=0; i<labels.rows; i++)
+//     {
+//         int id = (int)labels.at<int>(i);
+//         hot.at<float>(i, id) = 1.0f;
+//     }
+//     timer t;
+//     nn->train(data, 0, hot);
+//     double t1 = t.elapsed();
+//
+//     cv_load("Testing/", data, labels, max_classes, "mlp test  ");
+//     t.restart();
+//     Mat results;
+//     // doing single predictions is slower, but this avoids having to unroll the result
+//     for (int r=0; r<data.rows; r++) {
+//         float p = nn->predict(data.row(r));
+//         results.push_back(p);
+//     }
+//     double t2 = t.elapsed();
+//     cout << "mlp " << t1 << " / " << t2 << " seconds." << endl;
+//
+//     cv_results(max_classes, results, labels, "mlp ");
+//     return 0;
+// }
 
 
 int main(int argc, char **argv)
@@ -379,24 +381,24 @@ int main(int argc, char **argv)
     int batch_size = parser.get<int>("batch");
     float learn = parser.get<float>("learn");
     float decay = parser.get<float>("decay");
-    bool do_svm = parser.has("svm");
-    bool do_mlp = parser.has("mlp");
+    // bool do_svm = parser.has("svm");
+    // bool do_mlp = parser.has("mlp");
     bool do_test = parser.has("test");
 
-    if (do_svm)
-        return cv_svm(max_classes);
-    if (do_mlp)
-        return cv_mlp(max_classes);
+    // if (do_svm)
+    //     return cv_svm(max_classes);
+    // if (do_mlp)
+    //     return cv_mlp(max_classes);
     if (do_test)
         return dnn_test(json, saved);
 
-    if (opt == "rms")
-        return dnn_train<RMSprop>(json, saved, learn, decay, batch_size);
-    if (opt == "adam")
-        return dnn_train<adam>(json, saved, learn, decay, batch_size);
-    if (opt == "adagrad")
-        return dnn_train<adagrad>(json, saved, learn, decay, batch_size);
-    if (opt == "momentum")
-        return dnn_train<momentum>(json, saved, learn, decay, batch_size);
+    // if (opt == "rms")
+    //     return dnn_train<RMSprop>(json, saved, learn, decay, batch_size);
+    // if (opt == "adam")
+    //     return dnn_train<adam>(json, saved, learn, decay, batch_size);
+    // if (opt == "adagrad")
+    //     return dnn_train<adagrad>(json, saved, learn, decay, batch_size);
+    // if (opt == "momentum")
+    //     return dnn_train<momentum>(json, saved, learn, decay, batch_size);
     return dnn_train<gradient_descent>(json, saved, learn, decay, batch_size);
 }
