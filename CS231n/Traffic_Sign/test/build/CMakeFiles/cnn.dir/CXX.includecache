@@ -6,13 +6,53 @@
 
 #IncludeRegexTransform: 
 
-..//tiny_dnn/activations/activation_function.h
-algorithm
--
-utility
--
+..//tiny_dnn/activations/activation_layer.h
+tiny_dnn/layers/layer.h
+../tiny_dnn/activations/tiny_dnn/layers/layer.h
 tiny_dnn/util/util.h
 ../tiny_dnn/activations/tiny_dnn/util/util.h
+
+..//tiny_dnn/activations/elu_layer.h
+tiny_dnn/activations/activation_layer.h
+../tiny_dnn/activations/tiny_dnn/activations/activation_layer.h
+tiny_dnn/layers/layer.h
+../tiny_dnn/activations/tiny_dnn/layers/layer.h
+
+..//tiny_dnn/activations/leaky_relu_layer.h
+tiny_dnn/activations/activation_layer.h
+../tiny_dnn/activations/tiny_dnn/activations/activation_layer.h
+tiny_dnn/layers/layer.h
+../tiny_dnn/activations/tiny_dnn/layers/layer.h
+
+..//tiny_dnn/activations/relu_layer.h
+tiny_dnn/activations/activation_layer.h
+../tiny_dnn/activations/tiny_dnn/activations/activation_layer.h
+tiny_dnn/layers/layer.h
+../tiny_dnn/activations/tiny_dnn/layers/layer.h
+
+..//tiny_dnn/activations/sigmoid_layer.h
+tiny_dnn/activations/activation_layer.h
+../tiny_dnn/activations/tiny_dnn/activations/activation_layer.h
+tiny_dnn/layers/layer.h
+../tiny_dnn/activations/tiny_dnn/layers/layer.h
+
+..//tiny_dnn/activations/softmax_layer.h
+tiny_dnn/activations/activation_layer.h
+../tiny_dnn/activations/tiny_dnn/activations/activation_layer.h
+tiny_dnn/layers/layer.h
+../tiny_dnn/activations/tiny_dnn/layers/layer.h
+
+..//tiny_dnn/activations/tanh_layer.h
+tiny_dnn/activations/activation_layer.h
+../tiny_dnn/activations/tiny_dnn/activations/activation_layer.h
+tiny_dnn/layers/layer.h
+../tiny_dnn/activations/tiny_dnn/layers/layer.h
+
+..//tiny_dnn/activations/tanh_p1m2_layer.h
+tiny_dnn/activations/activation_layer.h
+../tiny_dnn/activations/tiny_dnn/activations/activation_layer.h
+tiny_dnn/layers/layer.h
+../tiny_dnn/activations/tiny_dnn/layers/layer.h
 
 ..//tiny_dnn/config.h
 cstddef
@@ -423,8 +463,6 @@ string
 -
 vector
 -
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
 tiny_dnn/layers/partial_connected_layer.h
 ../tiny_dnn/layers/tiny_dnn/layers/partial_connected_layer.h
 tiny_dnn/util/util.h
@@ -439,8 +477,6 @@ string
 -
 vector
 -
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
 tiny_dnn/layers/partial_connected_layer.h
 ../tiny_dnn/layers/tiny_dnn/layers/partial_connected_layer.h
 tiny_dnn/util/util.h
@@ -479,8 +515,6 @@ tiny_dnn/core/kernels/conv2d_op_libdnn.h
 ../tiny_dnn/layers/tiny_dnn/core/kernels/conv2d_op_libdnn.h
 tiny_dnn/core/kernels/conv2d_op_opencl.h
 ../tiny_dnn/layers/tiny_dnn/core/kernels/conv2d_op_opencl.h
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
 tiny_dnn/util/util.h
 ../tiny_dnn/layers/tiny_dnn/util/util.h
 tiny_dnn/util/image.h
@@ -497,8 +531,6 @@ tiny_dnn/core/backend_tiny.h
 ../tiny_dnn/layers/tiny_dnn/core/backend_tiny.h
 tiny_dnn/core/backend_avx.h
 ../tiny_dnn/layers/tiny_dnn/core/backend_avx.h
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
 tiny_dnn/util/util.h
 ../tiny_dnn/layers/tiny_dnn/util/util.h
 tiny_dnn/util/image.h
@@ -511,12 +543,6 @@ tiny_dnn/layers/layer.h
 ../tiny_dnn/layers/tiny_dnn/layers/layer.h
 tiny_dnn/util/util.h
 ../tiny_dnn/layers/tiny_dnn/util/util.h
-
-..//tiny_dnn/layers/feedforward_layer.h
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
-tiny_dnn/layers/layer.h
-../tiny_dnn/layers/tiny_dnn/layers/layer.h
 
 ..//tiny_dnn/layers/fully_connected_layer.h
 tiny_dnn/layers/layer.h
@@ -561,8 +587,6 @@ tiny_dnn/util/util.h
 ../tiny_dnn/layers/tiny_dnn/util/util.h
 tiny_dnn/util/weight_init.h
 ../tiny_dnn/layers/tiny_dnn/util/weight_init.h
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
 tiny_dnn/optimizers/optimizer.h
 ../tiny_dnn/layers/tiny_dnn/optimizers/optimizer.h
 tiny_dnn/util/image.h
@@ -585,8 +609,6 @@ tiny_dnn/layers/deconvolutional_layer.h
 ../tiny_dnn/layers/tiny_dnn/layers/deconvolutional_layer.h
 tiny_dnn/layers/dropout_layer.h
 ../tiny_dnn/layers/tiny_dnn/layers/dropout_layer.h
-tiny_dnn/layers/feedforward_layer.h
-../tiny_dnn/layers/tiny_dnn/layers/feedforward_layer.h
 tiny_dnn/layers/fully_connected_layer.h
 ../tiny_dnn/layers/tiny_dnn/layers/fully_connected_layer.h
 tiny_dnn/layers/layer.h
@@ -635,24 +657,18 @@ tiny_dnn/core/kernels/maxpool_grad_op.h
 ../tiny_dnn/layers/tiny_dnn/core/kernels/maxpool_grad_op.h
 tiny_dnn/core/kernels/maxpool_op.h
 ../tiny_dnn/layers/tiny_dnn/core/kernels/maxpool_op.h
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
 tiny_dnn/util/util.h
 ../tiny_dnn/layers/tiny_dnn/util/util.h
 tiny_dnn/util/image.h
 ../tiny_dnn/layers/tiny_dnn/util/image.h
 
 ..//tiny_dnn/layers/max_unpooling_layer.h
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
 tiny_dnn/util/util.h
 ../tiny_dnn/layers/tiny_dnn/util/util.h
 tiny_dnn/util/image.h
 ../tiny_dnn/layers/tiny_dnn/util/image.h
 
 ..//tiny_dnn/layers/partial_connected_layer.h
-tiny_dnn/layers/feedforward_layer.h
-../tiny_dnn/layers/tiny_dnn/layers/feedforward_layer.h
 tiny_dnn/layers/layer.h
 ../tiny_dnn/layers/tiny_dnn/layers/layer.h
 tiny_dnn/util/util.h
@@ -677,8 +693,6 @@ tiny_dnn/core/backend_tiny.h
 ../tiny_dnn/layers/tiny_dnn/core/backend_tiny.h
 tiny_dnn/core/backend_avx.h
 ../tiny_dnn/layers/tiny_dnn/core/backend_avx.h
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
 tiny_dnn/util/util.h
 ../tiny_dnn/layers/tiny_dnn/util/util.h
 tiny_dnn/util/image.h
@@ -695,8 +709,6 @@ tiny_dnn/core/backend_tiny.h
 ../tiny_dnn/layers/tiny_dnn/core/backend_tiny.h
 tiny_dnn/core/backend_avx.h
 ../tiny_dnn/layers/tiny_dnn/core/backend_avx.h
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/layers/tiny_dnn/activations/activation_function.h
 tiny_dnn/util/util.h
 ../tiny_dnn/layers/tiny_dnn/util/util.h
 tiny_dnn/util/image.h
@@ -743,8 +755,6 @@ string
 -
 vector
 -
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/tiny_dnn/activations/activation_function.h
 tiny_dnn/lossfunctions/loss_function.h
 ../tiny_dnn/tiny_dnn/lossfunctions/loss_function.h
 tiny_dnn/nodes.h
@@ -777,8 +787,6 @@ tiny_dnn/util/util.h
 ../tiny_dnn/tiny_dnn/util/util.h
 tiny_dnn/util/weight_init.h
 ../tiny_dnn/tiny_dnn/util/weight_init.h
-tiny_dnn/activations/activation_function.h
-../tiny_dnn/tiny_dnn/activations/activation_function.h
 tiny_dnn/util/image.h
 ../tiny_dnn/tiny_dnn/util/image.h
 
@@ -1093,8 +1101,6 @@ tiny_dnn/layers/deconvolutional_layer.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/layers/deconvolutional_layer.h
 tiny_dnn/layers/dropout_layer.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/layers/dropout_layer.h
-tiny_dnn/layers/feedforward_layer.h
-/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/layers/feedforward_layer.h
 tiny_dnn/layers/fully_connected_layer.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/layers/fully_connected_layer.h
 tiny_dnn/layers/input_layer.h
@@ -1115,10 +1121,22 @@ tiny_dnn/layers/quantized_deconvolutional_layer.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/layers/quantized_deconvolutional_layer.h
 tiny_dnn/layers/slice_layer.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/layers/slice_layer.h
+tiny_dnn/activations/elu_layer.h
+/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/activations/elu_layer.h
+tiny_dnn/activations/leaky_relu_layer.h
+/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/activations/leaky_relu_layer.h
+tiny_dnn/activations/relu_layer.h
+/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/activations/relu_layer.h
+tiny_dnn/activations/sigmoid_layer.h
+/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/activations/sigmoid_layer.h
+tiny_dnn/activations/softmax_layer.h
+/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/activations/softmax_layer.h
+tiny_dnn/activations/tanh_layer.h
+/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/activations/tanh_layer.h
+tiny_dnn/activations/tanh_p1m2_layer.h
+/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/activations/tanh_p1m2_layer.h
 tiny_dnn/layers/quantized_fully_connected_layer.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/layers/quantized_fully_connected_layer.h
-tiny_dnn/activations/activation_function.h
-/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/activations/activation_function.h
 tiny_dnn/lossfunctions/loss_function.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/lossfunctions/loss_function.h
 tiny_dnn/optimizers/optimizer.h
@@ -1145,8 +1163,8 @@ tiny_dnn/util/deserialization_helper.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/util/deserialization_helper.h
 tiny_dnn/util/serialization_helper.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/util/serialization_helper.h
-tiny_dnn/io/caffe/layer_factory.h
-/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/io/caffe/layer_factory.h
 tiny_dnn/models/alexnet.h
 /home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/models/alexnet.h
+tiny_dnn/io/caffe/layer_factory.h
+/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/test/tiny_dnn/tiny_dnn/io/caffe/layer_factory.h
 

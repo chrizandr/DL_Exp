@@ -1,7 +1,7 @@
 #include "tiny_dnn/tiny_dnn.h" // order matters, this has to go before opencv (ACCESS_WRITE)
 #include <opencv2/opencv.hpp>
 #include <iostream>
-// #include <glob.h>
+#include <glob.h>
 
 using namespace cv;
 using namespace std;
@@ -68,10 +68,10 @@ double load(const String &dir, Datatype &data, Labelstype &labels, int max_class
 {
     // int64 t0 = getTickCount();
     int k = 0;
+    cout << dir << endl;
     vector<String> csvs;
     glob(dir + "*.csv", csvs, true);
     for (auto cn : csvs) {
-        printf("%s\n", cn );
         ifstream csv(cn);
         string file;
         getline(csv, file); // skip csv header
@@ -103,10 +103,11 @@ double load(const String &dir, Datatype &data, Labelstype &labels, int max_class
             add_image(resized, label, data, labels);
         }
     }
+
+
     // int64 t1 = getTickCount();
     // return  ((t1-t0)/getTickFrequency());
 }
-
 
 //! load a json model from file, adjust traindata settings (winsize, max_classes)
 //!  optionally load pretrained weights
@@ -190,9 +191,9 @@ int dnn_train(const string &json_model, const string &pre_weigths, float learn, 
             ofs << nn;
             best_result = accuracy;
         }
-
-        for (int i=0; i<nn.depth()-1; i++)
-            nn[i]->output_to_image().write(format("layer%i.bmp", i));
+        //
+        // for (int i=0; i<nn.depth()-1; i++)
+        //     nn[i]->output_to_image().write(format("layer%i.bmp", i));
 
         t.restart();
         z = 0; // reset local counter
@@ -208,7 +209,6 @@ int dnn_train(const string &json_model, const string &pre_weigths, float learn, 
                   on_enumerate_data, on_enumerate_epoch);
     return 0;
 }
-
 
 //! load a json model and pretrained weights from file, adjust traindata settings (winsize, max_classes)
 //!  and predict on test images
@@ -242,112 +242,18 @@ int dnn_test(const string &json_model, const string &pre_weigths)
     cout << "dnn test  " << v_data.size() << " samples, " << n << " bytes. " << tl << " seconds." <<endl;
 
     timer t;
+    cout << "check1" << endl;
+
+    for(int i=0; i<v_data[0].size(); i++){
+        cout << v_data[0][i] << endl;
+    }
+
     result res = nn.test(v_data, v_labels);
+    cout << "check2" << endl;
     float accuracy = (float(res.num_success) / res.num_total);
     cout << "test " << accuracy << " accuracy, " << t.elapsed() << " seconds." << endl;
     return 0;
 }
-
-
-//! process opencv prediction results:
-void cv_results(int classes, Mat &results, Mat &labels, const String &title)
-{
-    // confusion:
-    Mat_<int> confusion(classes, classes, 0);
-    for (int i=0; i<results.rows; i++) {
-        int p = (int)results.at<float>(i);
-        int t = (int)labels.at<int>(i);
-        confusion(p, t) ++;
-    }
-    const int MAXC = 30; // try to fit console win
-    if (confusion.rows < MAXC)
-        cout << title << "confusion:\n" << confusion << endl;
-    else // skip results beyond MAXC
-        cout << title << format("confusion (showing %d of %d):\n", MAXC, confusion.rows) << confusion(Rect(0, 0, MAXC, MAXC)) << endl;
-
-    // accuracy:
-    float correct  = sum(confusion.diag())[0];
-    float accuracy = correct / results.rows;
-    cout << title << "accuracy: " << accuracy << endl;
-}
-
-
-//! load & print stats
-void cv_load(const String &dir, Mat &data, Mat &labels, int max_classes, const String &title)
-{
-    data.release();
-    labels.release();
-    double t = load(tscdir + dir, data, labels, max_classes);
-    int n = data.total() * data.elemSize();
-    cout << title << data.rows << " elems, " << n << " bytes, " << max_classes << " classes, " << t <<  " seconds." << endl;
-}
-
-using tiny_dnn::timer;
-
-// int cv_svm(int max_classes)
-// {
-//     Ptr<ml::SVM> svm = ml::SVM::create();
-//     svm->setKernel(ml::SVM::LINEAR);
-//
-//     Mat data, labels;
-//     cv_load("Training/", data, labels, max_classes, "svm train ");
-//
-//     timer t;
-//     svm->train(data, 0, labels);
-//     double t1 = t.elapsed();
-//
-//     cv_load("Testing/", data, labels, max_classes, "svm test  ");
-//
-//     t.restart();
-//     Mat results;
-//     svm->predict(data, results);
-//     double t2 = t.elapsed();
-//
-//     cout << "svm " << t1 << " / " << t2 << " seconds." << endl;
-//     cv_results(max_classes, results, labels, "svm ");
-//     return 0;
-// }
-
-//
-// int cv_mlp(int max_classes)
-// {
-//     Mat_<int> layers(4, 1);
-//     layers << WINSIZE*WINSIZE, 400, 100, max_classes;
-//
-//     Ptr<ml::ANN_MLP> nn = ml::ANN_MLP::create();
-//     nn->setLayerSizes(layers);
-//     nn->setTrainMethod(ml::ANN_MLP::BACKPROP, 0.0001);
-//     nn->setActivationFunction(ml::ANN_MLP::SIGMOID_SYM);
-//     nn->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER+TermCriteria::EPS, 300, 0.0001));
-//
-//     Mat data, labels;
-//     cv_load("Training/", data, labels, max_classes, "mlp train ");
-//
-//     // mlp needs "one-hot" encoded responses for training
-//     Mat hot(labels.rows, max_classes, CV_32F, 0.0f);
-//     for (int i=0; i<labels.rows; i++)
-//     {
-//         int id = (int)labels.at<int>(i);
-//         hot.at<float>(i, id) = 1.0f;
-//     }
-//     timer t;
-//     nn->train(data, 0, hot);
-//     double t1 = t.elapsed();
-//
-//     cv_load("Testing/", data, labels, max_classes, "mlp test  ");
-//     t.restart();
-//     Mat results;
-//     // doing single predictions is slower, but this avoids having to unroll the result
-//     for (int r=0; r<data.rows; r++) {
-//         float p = nn->predict(data.row(r));
-//         results.push_back(p);
-//     }
-//     double t2 = t.elapsed();
-//     cout << "mlp " << t1 << " / " << t2 << " seconds." << endl;
-//
-//     cv_results(max_classes, results, labels, "mlp ");
-//     return 0;
-// }
 
 
 int main(int argc, char **argv)
@@ -366,7 +272,7 @@ int main(int argc, char **argv)
         "{ weights w      |      | pretrained weights file (my.net) }"
         "{ optimizer o    |grad  | optimizer for dnn training }"
         "{ json j         |tsc32.txt| json model file for dnn (required) }"
-        "{ data D         |C:/data/BelgiumTSC/| path to dataset }" );
+        "{ data D         |/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/datasets/| path to dataset }" );
 
     string json(parser.get<string>("json"));
     if (parser.has("help") || json.empty())

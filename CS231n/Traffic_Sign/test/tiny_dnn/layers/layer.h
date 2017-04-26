@@ -24,7 +24,6 @@
 #include "tiny_dnn/util/util.h"
 #include "tiny_dnn/util/weight_init.h"
 
-#include "tiny_dnn/activations/activation_function.h"
 #include "tiny_dnn/optimizers/optimizer.h"
 
 #ifdef DNN_USE_IMAGE_API
@@ -261,6 +260,15 @@ class layer : public node {
    * array of input shapes (width x height x depth)
    **/
   virtual std::vector<shape3d> in_shape() const = 0;
+
+  /**
+   * set input shape of a layer (only used internally while shape inferring)
+   */
+  virtual void set_in_shape(const shape3d &in_shape) {
+    throw nn_error(
+      "Can't set shape. Shape inferring not applicable for this "
+      "layer (yet).");
+  };
 
   /**
    * array of output shapes (width x height x depth)
@@ -804,6 +812,13 @@ inline void connect(layerptr_t head,
   auto in_shape  = tail->in_shape()[tail_index];
 
   head->setup(false);
+
+  // todo (karandesai) enable shape inferring for all layers
+  // currently only possible for activation layers.
+  if (in_shape.size() == 0) {
+    tail->set_in_shape(out_shape);
+    in_shape = out_shape;
+  }
 
   if (out_shape.size() != in_shape.size()) {
     connection_mismatch(*head, *tail);

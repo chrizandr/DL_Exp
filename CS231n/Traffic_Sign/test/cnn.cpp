@@ -4,15 +4,16 @@ using namespace tiny_dnn::activation;
 using namespace tiny_dnn::layers;
 
 void construct_cnn() {
-    using namespace tiny_dnn;
 
     network<sequential> net;
-
+    // using namespace tiny_dnn;
+    // using namespace tiny_dnn::activation;
+    // using namespace tiny_dnn::layers;
     // add layers
-    net << conv(32, 32, 5, 1, 6) << tanh()  // in:32x32x1, 5x5conv, 6fmaps
-        << ave_pool(28, 28, 6, 2) << tanh() // in:28x28x6, 2x2pooling
-        << fc(14 * 14 * 6, 120) << tanh()   // in:14x14x6, out:120
-        << fc(120, 10);                     // in:120,     out:10
+    net << layers::conv(32, 32, 5, 1, 6) << activation::tanh()  // in:32x32x1, 5x5conv, 6fmaps
+      << layers::ave_pool(28, 28, 6, 2) << activation::tanh() // in:28x28x6, 2x2pooling
+      << layers::fc(14 * 14 * 6, 120) << activation::tanh()   // in:14x14x6, out:120
+      << layers::fc(120, 10);
 
     assert(net.in_data_size() == 32 * 32);
     assert(net.out_data_size() == 10);
@@ -39,5 +40,5 @@ void construct_cnn() {
 }
 
 int main(int argc, char **argv){
-    
+    construct_cnn();
 }
