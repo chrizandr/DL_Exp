@@ -230,7 +230,7 @@ int dnn_test(const string &json_model, const string &pre_weigths)
         ifstream ifs(pre_weigths);
         ifs >> nn;
     } catch (const nn_error& e) {
-       std::cout << e.what();
+       std::cout << e.what() << endl;
     }
 
     // load data
@@ -242,11 +242,6 @@ int dnn_test(const string &json_model, const string &pre_weigths)
     cout << "dnn test  " << v_data.size() << " samples, " << n << " bytes. " << tl << " seconds." <<endl;
 
     timer t;
-    cout << "check1" << endl;
-
-    for(int i=0; i<v_data[0].size(); i++){
-        cout << v_data[0][i] << endl;
-    }
 
     result res = nn.test(v_data, v_labels);
     cout << "check2" << endl;
@@ -262,8 +257,6 @@ int main(int argc, char **argv)
 
     CommandLineParser parser(argc, argv,
         "{ help h usage ? |      | show this message }"
-        "{ svm s          |      | reference svm test }"
-        "{ mlp m          |      | reference mlp test }"
         "{ test t         |      | test dnn on pretrained model }"
         "{ batch b        |    24| batch size for dnn training }"
         "{ maxc M         |    62| restrict to M classes (for speedup), only for svm,mlp }"
@@ -287,17 +280,10 @@ int main(int argc, char **argv)
     int batch_size = parser.get<int>("batch");
     float learn = parser.get<float>("learn");
     float decay = parser.get<float>("decay");
-    // bool do_svm = parser.has("svm");
-    // bool do_mlp = parser.has("mlp");
     bool do_test = parser.has("test");
 
-    // if (do_svm)
-    //     return cv_svm(max_classes);
-    // if (do_mlp)
-    //     return cv_mlp(max_classes);
     if (do_test)
         return dnn_test(json, saved);
-
     // if (opt == "rms")
     //     return dnn_train<RMSprop>(json, saved, learn, decay, batch_size);
     // if (opt == "adam")

@@ -21,6 +21,14 @@
             "h_stride": 1
         },
         {
+            "type": "tanh",
+            "in_size": {
+                "width": 28,
+                "height": 28,
+                "depth": 6
+            }
+        },
+        {
             "type": "maxpool<identity>",
             "in_size": {
                 "width": 32,

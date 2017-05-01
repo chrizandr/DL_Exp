@@ -1,0 +1,73 @@
+{
+    "nodes": [
+        {
+            "type": "conv",
+            "in_size": {
+                "width": 32,
+                "height": 32,
+                "depth": 3
+            },
+            "window_width": 5,
+            "window_height": 5,
+            "out_channels": 6,
+            "connection_table": {
+                "rows": 0,
+                "cols": 0,
+                "connection": "all"
+            },
+            "pad_type": 0,
+            "has_bias": true,
+            "w_stride": 1,
+            "h_stride": 1
+        },
+        {
+            "type": "tanh",
+            "in_size": {
+                "width": 28,
+                "height": 28,
+                "depth": 6
+            }
+        },
+        {
+            "type": "maxpool",
+            "in_size": {
+                "width": 28,
+                "height": 28,
+                "depth": 6
+            },
+            "pool_size_x": 2,
+            "pool_size_y": 2,
+            "stride_x": 2,
+            "stride_y": 2,
+            "pad_type": 0
+        },
+        {
+            "type": "tanh",
+            "in_size": {
+                "width": 14,
+                "height": 14,
+                "depth": 6
+            }
+        },
+        {
+            "type": "fully_connected",
+            "in_size": 1176,
+            "out_size": 120,
+            "has_bias": true
+        },
+        {
+            "type": "tanh",
+            "in_size": {
+                "width": 120,
+                "height": 1,
+                "depth": 1
+            }
+        },
+        {
+            "type": "fully_connected",
+            "in_size": 120,
+            "out_size": 10,
+            "has_bias": true
+        }
+    ]
+}
