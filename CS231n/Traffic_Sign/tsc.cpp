@@ -284,13 +284,5 @@ int main(int argc, char **argv)
 
     if (do_test)
         return dnn_test(json, saved);
-    // if (opt == "rms")
-    //     return dnn_train<RMSprop>(json, saved, learn, decay, batch_size);
-    // if (opt == "adam")
-    //     return dnn_train<adam>(json, saved, learn, decay, batch_size);
-    // if (opt == "adagrad")
-    //     return dnn_train<adagrad>(json, saved, learn, decay, batch_size);
-    // if (opt == "momentum")
-    //     return dnn_train<momentum>(json, saved, learn, decay, batch_size);
     return dnn_train<gradient_descent>(json, saved, learn, decay, batch_size);
 }
