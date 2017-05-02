@@ -37,9 +37,6 @@ void convert_image(const Mat &image, vec_t & tiny_vec)
     }
 }
 
-
-//! convert Mat to vec_t for tiny_dnn, and add to dataset
-//  tiny_dnn wants consecutive image planes
 void add_image(const Mat &image, int lab, std::vector<vec_t>& data, std::vector<label_t>& labels)
 {
     vec_t tiny_vec;
@@ -50,7 +47,6 @@ void add_image(const Mat &image, int lab, std::vector<vec_t>& data, std::vector<
 }
 
 
-//! convert image Mat for cv::ml classes, and add to dataset
 void add_image(const Mat &image, int lab, cv::Mat &data, cv::Mat &labels)
 {
     Mat img;
@@ -61,12 +57,9 @@ void add_image(const Mat &image, int lab, cv::Mat &data, cv::Mat &labels)
 }
 
 
-//! load images for max_classes classes from train or test dir.
-//  note, that the csv files *claim* to have W,h,x,y order, but actually, it's the other way round ! (H,W,y,x)
 template<class Datatype, class Labelstype>
 double load(const String &dir, Datatype &data, Labelstype &labels, int max_classes=-1, bool gray=true, int skip=0)
 {
-    // int64 t0 = getTickCount();
     int k = 0;
     cout << dir << endl;
     vector<String> csvs;
@@ -79,7 +72,6 @@ double load(const String &dir, Datatype &data, Labelstype &labels, int max_class
             k++;
             char c = 0;
             file = "";
-            // avoid "evil string globbing"
             while (csv.good()) {
                 csv.get(c);
                 if (c == ';') break;
@@ -109,8 +101,6 @@ double load(const String &dir, Datatype &data, Labelstype &labels, int max_class
     // return  ((t1-t0)/getTickFrequency());
 }
 
-//! load a json model from file, adjust traindata settings (winsize, max_classes)
-//!  optionally load pretrained weights
 template <class Optimizer>
 int dnn_train(const string &json_model, const string &pre_weigths, float learn, float decay, int batch_size)
 {
@@ -135,8 +125,7 @@ int dnn_train(const string &json_model, const string &pre_weigths, float learn, 
             ifstream ifs(pre_weigths.c_str());
             ifs >> nn;
         } else {
-            //nn.weight_init(weight_init::xavier(1));
-            //nn.weight_init(weight_init::lecun());
+            nn.weight_init(weight_init::xavier(1));
         }
 
         nn.save("mymodel.txt", content_type::model, file_format::json);
@@ -182,8 +171,6 @@ int dnn_train(const string &json_model, const string &pre_weigths, float learn, 
         result res = nn.test(v_data, v_labels);
         float accuracy = (float(res.num_success) / res.num_total);
         cout << accuracy << " accuracy." << endl;
-        //double loss = nn.get_loss<loss_t>(v_data, v_labels);
-        //cout << "loss " << loss << endl;
 
         // save weights
         if (accuracy > best_result) {
@@ -210,8 +197,6 @@ int dnn_train(const string &json_model, const string &pre_weigths, float learn, 
     return 0;
 }
 
-//! load a json model and pretrained weights from file, adjust traindata settings (winsize, max_classes)
-//!  and predict on test images
 int dnn_test(const string &json_model, const string &pre_weigths)
 {
     using namespace tiny_dnn;
@@ -244,7 +229,6 @@ int dnn_test(const string &json_model, const string &pre_weigths)
     timer t;
 
     result res = nn.test(v_data, v_labels);
-    cout << "check2" << endl;
     float accuracy = (float(res.num_success) / res.num_total);
     cout << "test " << accuracy << " accuracy, " << t.elapsed() << " seconds." << endl;
     return 0;
@@ -265,7 +249,7 @@ int main(int argc, char **argv)
         "{ weights w      |      | pretrained weights file (my.net) }"
         "{ optimizer o    |grad  | optimizer for dnn training }"
         "{ json j         |tsc32.txt| json model file for dnn (required) }"
-        "{ data D         |/home/chrizandr/DL_Exp/CS231n/Traffic_Sign/datasets/| path to dataset }" );
+        "{ data D         |/home/sanny/DL_Exp/CS231n/Traffic_Sign/datasets/| path to dataset }" );
 
     string json(parser.get<string>("json"));
     if (parser.has("help") || json.empty())
