@@ -1,7 +1,4 @@
 import numpy as np
-import pdb
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 
 def Activation(W, x):
@@ -34,20 +31,26 @@ def Perceptron(X, Y, lr=0.1, epochs=200):
 
 
 if __name__ == "__main__":
+    epochs = 200
     X = np.array([
-        [1, 1],
-        [-1, -1],
-        [2, 2],
-        [-2, -2],
-        [-1, 1],
-        [1, -1]
+        [2, 4],
+        [3, 5],
+        [6, 8],
+        [1, 2],
+        [4, 7],
+        [4, 2],
+        [5, 1],
+        [8, 3],
+        [6, 4],
+        [7, 5],
     ])
-
+    plt.scatter()
     Y = np.array([-1, -1, 1, -1, 1, 1])
 
-    W, weights = Perceptron(X, Y)
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.plot(weights[:, 0], weights[:, 1], weights[:, 2])
-    fig.show()
-    pdb.set_trace()
+    W, weights = Perceptron(X, Y, epochs=200)
+
+    with open("out.txt", "w") as f:
+        for t in range(epochs):
+            f.write("\nEpoch {}:\n".format(t))
+            for i in range(len(X)):
+                f.write("W = {}\n".format(weights[t+i]))
