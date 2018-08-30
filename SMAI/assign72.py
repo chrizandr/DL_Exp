@@ -1,6 +1,7 @@
-import numpy as np
+"""Q3."""
 import matplotlib.pyplot as plt
-import pdb
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def Activation(W, x):
@@ -8,15 +9,17 @@ def Activation(W, x):
     return np.dot(W, x)
 
 
-def MSE_SGD(data, lr=0.045, epochs=200):
+def MSE_SGD(data, lr=0.01, epochs=200):
     """Perceptron."""
     Y = data[:, 1]
     X = data[:, 0]
     W = np.array([1, 1])
 
     weights = []
+    grad = np.array([10, 10])
+    t = 0
 
-    for t in range(epochs):
+    while np.linalg.norm(lr*grad) > 0.0001:
         print("\n\nEpoch: {}".format(t))
         grad = np.zeros(2)
         for i in range(len(X)):
@@ -32,53 +35,62 @@ def MSE_SGD(data, lr=0.045, epochs=200):
         print("W after = {}".format(W))
         weights.append(W)
         print("New Weight: {}".format(W))
-        # grad = grad
-        if np.linalg.norm(lr*grad) < 0.0001:
-            break
 
-    return W, np.array(weights)
+        t += 1
+
+    return W, np.array(weights), t
 
 
-def MSE_Newton(data, lr=0.01, epochs=200):
+def MSE_Newton(data, epochs=200):
     """Perceptron."""
     Y = data[:, 1]
     X = data[:, 0]
-    W = np.array([0, 0])
+    W = np.array([1, 1])
 
     weights = []
+    grad = np.array([10, 10])
+    t = 0
 
-    for t in range(epochs):
+    while np.linalg.norm(grad) > 0.0001:
         print("\n\nEpoch: {}".format(t))
-        grad = np.zeros(2)
+        H = np.zeros((2, 2))
+        delta_f = np.zeros(2)
         for i in range(len(X)):
-            delta_f = np.array([
+            delta_f += np.array([
                                 -2*X[i] * (Y[i] - W[0]*X[i] - W[1]),
                                 -2 * (Y[i] - W[0]*X[i] - W[1]),
-                               ])
-            H = np.array([[2*(X[i]**2), 2*X[i]],
-                          [2*X[i],      2]])
-            try:
-                H_inv = np.linalg.inv(H)
-                grad = grad + np.dot(H_inv, delta_f)
-            except np.linalg.LinAlgError:
-                continue
+                                ])
+            H += np.array([[2*(X[i]**2), 2*X[i]],
+                           [2*X[i],      2]])
+        try:
+            H_inv = np.linalg.inv(H)
+        except np.linalg.LinAlgError:
+            continue
 
+        grad = np.dot(H_inv, delta_f)
         grad = grad / len(X)
 
         print("W before = {}".format(W))
-        W = W - (lr * grad)
+        W = W - grad
         print("W after = {}".format(W))
         weights.append(W)
         print("New Weight: {}".format(W))
-        # grad = grad
-        # if np.linalg.norm(lr*grad) < 0.0001 and np.linalg.norm(lr*grad) > 0:
-        #     break
 
-    return W, np.array(weights)
+        t += 1
+
+    return W, np.array(weights), t
+
+
+def error(W, X, Y):
+    """Find error."""
+    error = 0
+    for i in range(len(X)):
+        error += (Y[i] - W[0]*X[i] - W[1])**2
+    return error
 
 
 if __name__ == "__main__":
-    epochs = 200
+    # Data
     X = np.array([
         [2, 2],
         [3, 4],
@@ -92,13 +104,60 @@ if __name__ == "__main__":
         [7, 6],
     ])
 
-    plt.scatter(X[:, 0], X[:, 1])
+    plt.scatter(X[:, 0], X[:, 1], color='red')
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.show()
 
-    # W, weights = MSE_SGD(X, epochs=200)
-    W, weights = MSE_Newton(X, epochs=200)
+    # Training
+    W_sgd, weights_sgd, t_sgd = MSE_SGD(X, epochs=200)
+    W_newt, weights_newt, t_newt = MSE_Newton(X, epochs=200)
 
-    with open("out.txt", "w") as f:
-        for t in range(epochs):
+    with open("sgd.txt", "w") as f:
+        for t in range(t_sgd):
             f.write("\nEpoch {}:\n".format(t))
-            f.write("W = {}\n".format(weights[t]))
+            f.write("W = {}\n".format(weights_sgd[t]))
+
+    with open("newt.txt", "w") as f:
+        for t in range(t_newt):
+            f.write("\nEpoch {}:\n".format(t))
+            f.write("W = {}\n".format(weights_newt[t]))
+
+    # Convergence
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    ax.plot(range(t_sgd), weights_sgd[:, 0], weights_sgd[:, 1], color='red', label="Gradient Descent")
+    ax.plot(range(t_newt), weights_newt[:, 0], weights_newt[:, 1],  color='blue', label="Newton's Method")
+    ax.set_xlabel('Epochs')
+    ax.set_ylabel(r'$\theta_1$')
+    ax.set_zlabel(r'$\theta_2$')
+    ax.legend()
+    plt.show()
+
+    errors_sgd = [error(w, X[:, 0], X[:, 1]) for w in weights_sgd]
+    errors_newt = [error(w, X[:, 0], X[:, 1]) for w in weights_newt]
+
+    plt.plot(range(t_sgd), errors_sgd,  color='red', label="Gradient Descent")
+    plt.plot(range(t_newt), errors_newt,  color='blue', label="Newton's Method")
+    plt.xlabel("Epochs")
+    plt.ylabel("Error")
+    plt.legend()
+    plt.show()
+
+    # Error Surface
+    opt_weight = weights_newt[-1]
+    w1 = np.linspace(opt_weight[0] - 1, opt_weight[0] + 1, 30)
+    w2 = np.linspace(opt_weight[1] - 1, opt_weight[1] + 1, 30)
+    w1_mesh, w2_mesh = np.meshgrid(w1, w2)
+
+    errors = np.array([[error([w_1, w_2], X[:, 0], X[:, 1]) for w_2 in w2] for w_1 in w1])
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.plot_surface(w1_mesh, w2_mesh, errors, linewidth=0, antialiased=False)
+    ax.set_zlabel('Errors')
+    ax.set_xlabel(r'$\theta_1$')
+    ax.set_ylabel(r'$\theta_2$')
+    ax.set_title("Error Surface")
+    plt.show()
