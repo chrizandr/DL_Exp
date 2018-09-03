@@ -53,7 +53,7 @@ def Logistic_Regression(X, Y, lr=0.1):
 
 
 def Logistic_Regression_nobias(X, Y, lr=0.1):
-    """Perceptron."""
+    """LR no bias."""
     n, d = X.shape
     X_aug = X
     W = np.array([1, 1])
@@ -98,40 +98,22 @@ def argmax(prediction):
     return max(prediction.items(), key=operator.itemgetter(1))[0]
 
 
-def Bayes_Error(Y, predictions):
-    """Bayes."""
-    samples = Y.shape[0]
-    error = 0.0
-    for i, y in enumerate(Y):
-        y_pred = argmax(predictions[i])
-        error += 0 if y_pred == y else 1
-
-    return error/samples
-
-
-def Bayes_Eval(X, means, covariances, probs):
+def Bayes_Decision(means, covariances, probs):
     '''Cost function'''
-    addition_term = {}
-    inverse_covariance = {}
-    predictions = []
+    weights = {}
 
     for i in covariances.keys():
-        term = -0.5 * np.log(np.linalg.norm(covariances[i]))
+        inverse_covariance = np.linalg.inv(covariances[i])
+        term = np.dot(means[i], inverse_covariance)
+        term = np.dot(term, means[i])
+        term *= -0.5
         term += np.log(probs[i])
-        addition_term[i] = term
-        inverse_covariance[i] = np.linalg.inv(covariances[i])
+        bias = term
 
-    for x in X:
-        prediction = {}
-        for i in means.keys():
-            score = np.dot((x - means[i]).T, inverse_covariance[i])
-            score = np.dot(score, x - means[i])
-            score = -0.5*score
-            score += addition_term[i]
-            prediction[i] = score
-        predictions.append(prediction)
+        W = np.dot(inverse_covariance, means[i].T)
+        weights[i] = np.concatenate((W, [bias]))
 
-    return predictions
+    return weights
 
 
 def Find_Mean_Covariance(X, Y):
@@ -147,11 +129,52 @@ def Find_Mean_Covariance(X, Y):
     return means, covariances
 
 
+def decision_boundary(W):
+    X = np.linspace(-10, 10, 30).astype(np.float)
+    Y = -1*(W[0]/W[1])*X - (W[2]/W[1])
+    return X, Y
+
+
 if __name__ == "__main__":
     X1 = np.random.normal(loc=0, scale=1, size=(500, 2))
     Y1 = np.zeros(500, dtype=np.int)
     X2 = np.random.normal(loc=2, scale=2, size=(500, 2))
     Y2 = np.ones(500, dtype=np.int)
+    probs = {0: 0.5, 1: 0.5}
+
+    X = np.concatenate((X1, X2), axis=0)
+    Y = np.concatenate((Y1, Y2), axis=0)
+
+    means, covariances = Find_Mean_Covariance(X, Y)
+    W_bayes = Bayes_Decision(means, covariances, probs)
+
+    W_bias, _ = Logistic_Regression(X, Y)
+    W_nobias, _ = Logistic_Regression_nobias(X, Y)
+
+    error_bias = Logistic_Error(X, W_bias, Y, bias=True)
+    error_nobias = Logistic_Error(X, W_nobias, Y, bias=False)
+    print("Error with bias: ", error_bias)
+    print("Error without bias: ", error_nobias)
+    # Plot decision boundary
+    W_nobias = np.concatenate((W_nobias, [0]))
+
+    X, y = decision_boundary(W_bayes[0] - W_bayes[1])
+    plt.plot(X, y, color='pink', label="Bayes classifier")
+    X, y = decision_boundary(W_bias)
+    plt.plot(X, y, color='green', label="Logistic Regression")
+    X, y = decision_boundary(W_nobias)
+    plt.plot(X, y, color='yellow', label="Logistic Regression no bias")
+    plt.scatter(X1[:, 0], X1[:, 1], color='red', label="Class 0")
+    plt.scatter(X2[:, 0], X2[:, 1], color='blue', label="Class 1")
+    plt.grid()
+    plt.legend()
+    plt.show()
+
+    X1 = np.random.normal(loc=0, scale=1, size=(500, 2))
+    Y1 = np.zeros(500, dtype=np.int)
+    X2 = np.random.normal(loc=2, scale=2, size=(500, 2))
+    Y2 = np.ones(500, dtype=np.int)
+    probs = {0: 0.5, 1: 0.5}
 
     X = np.concatenate((X1, X2), axis=0)
     Y = np.concatenate((Y1, Y2), axis=0)
@@ -159,7 +182,9 @@ if __name__ == "__main__":
     W_bias, _ = Logistic_Regression(X, Y)
     W_nobias, _ = Logistic_Regression_nobias(X, Y)
 
+    print("Resampling")
     error_bias = Logistic_Error(X, W_bias, Y, bias=True)
     error_nobias = Logistic_Error(X, W_nobias, Y, bias=False)
 
-    pdb.set_trace()
+    print("Error with bias: ", error_bias)
+    print("Error without bias: ", error_nobias)
