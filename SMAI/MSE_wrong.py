@@ -2,18 +2,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
+import pdb
 
 
-def Activation(W, x):
-    """Activation function."""
-    return np.dot(W, x)
-
-
-def MSE_SGD(data, lr=0.01, epochs=200):
-    """Perceptron."""
-    Y = data[:, 1]
-    X = data[:, 0]
-    W = np.array([1, 1])
+def MSE_SGD(data, lr=0.01):
+    """MSE Classification."""
+    X = data[0]
+    Y = data[1]
+    W = np.array([1, 2])
 
     weights = []
     grad = np.array([10, 10])
@@ -23,59 +19,15 @@ def MSE_SGD(data, lr=0.01, epochs=200):
         print("\n\nEpoch: {}".format(t))
         grad = np.zeros(2)
         for i in range(len(X)):
-            delta_f = np.array([
-                                -2*X[i] * (Y[i] - W[0]*X[i] - W[1]),
-                                -2 * (Y[i] - W[0]*X[i] - W[1]),
-                               ])
+            delta_f = -1 * Y[i] * X[i]
             grad = grad + delta_f
         grad = grad / len(X)
 
-        print("W before = {}".format(W))
         W = W - (lr * grad)
-        print("W after = {}".format(W))
         weights.append(W)
-        print("New Weight: {}".format(W))
 
-        t += 1
-
-    return W, np.array(weights), t
-
-
-def MSE_Newton(data, epochs=200):
-    """Perceptron."""
-    Y = data[:, 1]
-    X = data[:, 0]
-    W = np.array([1, 1])
-
-    weights = []
-    grad = np.array([10, 10])
-    t = 0
-
-    while np.linalg.norm(grad) > 0.0001:
-        print("\n\nEpoch: {}".format(t))
-        H = np.zeros((2, 2))
-        delta_f = np.zeros(2)
-        for i in range(len(X)):
-            delta_f += np.array([
-                                -2*X[i] * (Y[i] - W[0]*X[i] - W[1]),
-                                -2 * (Y[i] - W[0]*X[i] - W[1]),
-                                ])
-            H += np.array([[2*(X[i]**2), 2*X[i]],
-                           [2*X[i],      2]])
-        try:
-            H_inv = np.linalg.inv(H)
-        except np.linalg.LinAlgError:
-            continue
-
-        grad = np.dot(H_inv, delta_f)
-        grad = grad / len(X)
-
-        print("W before = {}".format(W))
-        W = W - grad
-        print("W after = {}".format(W))
-        weights.append(W)
-        print("New Weight: {}".format(W))
-
+        if t > 1000:
+            return W, np.array(weights), t
         t += 1
 
     return W, np.array(weights), t
@@ -85,32 +37,38 @@ def error(W, X, Y):
     """Find error."""
     error = 0
     for i in range(len(X)):
-        error += (Y[i] - W[0]*X[i] - W[1])**2
+        error += (1 - Y[i] * np.dot(W.T, X[i]))
     return error
 
 
 if __name__ == "__main__":
     # Data
     X = np.array([
-        [2, 2],
+        [2, 4],
         [3, 4],
         [1, 2],
         [4, 5],
-        [6, 6],
+        [6, 7],
+
         [4, 3],
-        [5, 6],
-        [2, 3],
         [6, 5],
+        [5, 3],
+        [4, 1],
         [7, 6],
     ])
-
-    plt.scatter(X[:, 0], X[:, 1], color='red')
+    Y = np.array([1, 1, 1, 1, 1, 0, 0, 0, 0, 0])
+    Y_dash = np.array([1, 1, 1, 1, 1, -1, -1, -1, -1, -1])
+    plt.scatter(X[:, 0], X[:, 1], color=['red' if y > 0 else 'blue' for y in Y])
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.show()
 
     # Training
-    W_sgd, weights_sgd, t_sgd = MSE_SGD(X, epochs=200)
+    W, Weights, t = MSE_SGD((X, Y))
+    errors = [error(w, X, Y) for w in Weights]
+    pdb.set_trace()
+    W, Weights, t = MSE_SGD((X, Y_dash))
+    errors = [error(w, X, Y) for w in Weights]
     W_newt, weights_newt, t_newt = MSE_Newton(X, epochs=200)
 
     with open("sgd.txt", "w") as f:
