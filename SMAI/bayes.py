@@ -1,5 +1,6 @@
-import numpy as np
+"""Bayes optimal classification."""
 import matplotlib.pyplot as plt
+import numpy as np
 import operator
 
 
@@ -20,7 +21,7 @@ def Bayes_Error(Y, predictions):
 
 
 def Bayes_Eval(X, means, covariances, probs):
-    '''Error function'''
+    """Prediction function."""
     addition_term = {}
     inverse_covariance = {}
     predictions = []
@@ -45,6 +46,7 @@ def Bayes_Eval(X, means, covariances, probs):
 
 
 def Find_Mean_Covariance(X, Y):
+    """Find the mean and the covariance."""
     labels = np.unique(Y)
     means = {}
     covariances = {}

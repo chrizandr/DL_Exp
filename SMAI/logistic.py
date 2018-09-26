@@ -1,8 +1,7 @@
-import numpy as np
+"""Logistic Regression two class compared with Bayes Optimal decision."""
 import matplotlib.pyplot as plt
+import numpy as np
 import operator
-
-import pdb
 
 
 def Logit(W, X):
@@ -80,7 +79,7 @@ def Logistic_Regression_nobias(X, Y, lr=0.1):
 
 
 def Cost(X, Y, W):
-    '''Cost function'''
+    """Cost function."""
     num_samples = X.shape[0]
     predictions = Logit(W, X)
 
@@ -99,7 +98,7 @@ def argmax(prediction):
 
 
 def Bayes_Decision(means, covariances, probs):
-    '''Cost function'''
+    """Cost function."""
     weights = {}
 
     for i in covariances.keys():
@@ -117,6 +116,7 @@ def Bayes_Decision(means, covariances, probs):
 
 
 def Find_Mean_Covariance(X, Y):
+    """Mean and covariance."""
     labels = np.unique(Y)
     means = {}
     covariances = {}
@@ -130,6 +130,7 @@ def Find_Mean_Covariance(X, Y):
 
 
 def decision_boundary(W):
+    """Plot the points for decision boundary."""
     X = np.linspace(-10, 10, 30).astype(np.float)
     Y = -1*(W[0]/W[1])*X - (W[2]/W[1])
     return X, Y

@@ -1,9 +1,10 @@
-import numpy as np
+"""PCA."""
 import matplotlib.pyplot as plt
-import pdb
+import numpy as np
 
 
 def PCA(X):
+    """PCA."""
     X -= np.mean(X, axis=0)
     covariance = np.cov(X, rowvar=False)
     evals, evecs = np.linalg.eig(covariance)

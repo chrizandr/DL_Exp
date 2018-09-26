@@ -1,3 +1,4 @@
+"""Incomplete code."""
 import numpy as np
 import pdb
 import matplotlib.pyplot as plt
@@ -88,8 +89,8 @@ if __name__ == "__main__":
     plt.ylabel("Probability")
     plt.legend()
     plt.show()
-    pdb.set_trace()
 
+    probs = {}
     means, covariances = Find_Mean_Covariance(X, Y)
     x_vals, y_vals, score1, score2 = decision_boundary(means, covariances, probs)
 
