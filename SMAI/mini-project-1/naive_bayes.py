@@ -3,7 +3,6 @@ from PIL import Image
 import numpy as np
 import sys
 import operator
-import pdb
 
 
 def read_data(filepath, type_="train", class_num=None):
