@@ -2,3 +2,5 @@ datasets*
 datasets/*
 tiny-dnn/*
 tiny-dnn*
+
+*.pkl

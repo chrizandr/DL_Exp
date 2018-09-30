@@ -1,5 +1,6 @@
 import numpy as np
 from PIL import Image
+import pdb
 
 
 def read_data(filepath, type_="train", class_num=None):
@@ -23,7 +24,9 @@ def read_train(filepath):
     class_counter = 0
     for line in f:
         data = line.strip().split(" ")
-        img = np.array(Image.open(data[0]).convert("L"))
+        img = Image.open(data[0]).convert("L")
+        img.thumbnail((64, 64), Image.ANTIALIAS)
+        img = np.array(img)
         X.append(img.flatten())
         if data[1] not in class_num:
             class_num[data[1]] = class_counter
@@ -40,7 +43,9 @@ def read_test(filepath):
     X = []
     for line in f:
         data = line.strip()
-        img = np.array(Image.open(data).convert("L"))
+        img = Image.open(data).convert("L")
+        img.thumbnail((64, 64), Image.ANTIALIAS)
+        img = np.array(img)
         X.append(img.flatten())
     X = np.array(X)
     return X
