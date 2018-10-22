@@ -8,7 +8,7 @@ gt_path = "/home/chris/DL_Exp/SMAI/mini-project-1/ground.txt"
 pred_path = "/home/chris/DL_Exp/SMAI/mini-project-1/pred.txt"
 
 # run classifier and store output in pred_path
-script_path = "/home/chris/DL_Exp/SMAI/mini-project-1/linear_classifier.py"
+script_path = "/home/chris/2018701020/naive_bayes.py"
 os.system("python3 {} {} {} > {}".format(script_path, train_path, test_path, pred_path))
 
 """

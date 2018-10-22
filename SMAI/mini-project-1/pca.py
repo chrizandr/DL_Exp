@@ -49,7 +49,7 @@ if __name__ == "__main__":
     data_path = "train.txt"
     X, Y, class_num = read_data(data_path, type_="train")
 
-    sizes = list(range(4088, 4097, 8))
+    sizes = list(range(8, 4097, 8))
     errors = []
     for i in sizes:
         print("Reducing and reconstructing for size {}".format(i))
