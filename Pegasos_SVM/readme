@@ -1,0 +1,22 @@
+For linear SVM with toy data:
+
+python svm.py
+
+For kernel SVM with toy data:
+
+python ksvm.py
+
+For both SVMs on Fashion MNIST:
+Change the data location appropriately.
+
+python fmnist.py
+
+For time complexity experiments
+
+python time.py
+
+
+Dependencies:
+Matplotlib
+Scikit-learn (toy dataset)
+Numpy

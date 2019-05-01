@@ -114,6 +114,8 @@ if __name__ == "__main__":
     X, Y = make_moons(n_samples=1000, noise=.05)
     model = MercerSVM(C=0.1, iterations=10000, verbose=True)
     model.fit(X, Y)
+    ypred = model.predict(X)
+    print((ypred == Y).sum())
     plt.scatter(X[:, 0], X[:, 1], color=['red' if y else 'blue' for y in Y])
     decision_boundary(model)
     plt.legend()
