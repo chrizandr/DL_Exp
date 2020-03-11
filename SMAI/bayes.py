@@ -54,7 +54,7 @@ def Find_Mean_Covariance(X, Y):
         indices = (Y == l).nonzero()[0]
         X_samples = X[indices]
         means[l] = np.mean(X_samples, axis=0)
-        covariances[l] = np.cov(X.T)
+        covariances[l] = np.cov(X_samples.T)
 
     return means, covariances
 
