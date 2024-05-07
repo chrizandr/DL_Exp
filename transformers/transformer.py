@@ -23,8 +23,6 @@ class SDPAttentionBlock(nn.Module):
         self.WK = torch.nn.Linear(dk, int(dk / heads), bias=False)
         self.WV = torch.nn.Linear(dv, int(dv / heads), bias=False)
 
-        self.mask = torch.Tensor()
-
     def forward(self, keys, queries, values, masking=False):
         Q_ = self.WQ(queries)
         K_ = self.WK(keys)
@@ -129,6 +127,7 @@ class Decoder(nn.Module):
             out = block(keys, queries, values, encoder_values)
             keys, queries, values = out, out, out
         return values
+
 
 class Transformer(nn.Module):
     def __init__(self, context_length, dmodel, vocab_size):
