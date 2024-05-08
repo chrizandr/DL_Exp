@@ -18,7 +18,6 @@ class MultiHeadSDPAttentionBlock(nn.Module):
 class SDPAttentionBlock(nn.Module):
     def __init__(self, dk, dv, heads=1):
         super().__init__()
-        self.dk = dk
         self.WQ = torch.nn.Linear(dk, int(dk / heads), bias=False)
         self.WK = torch.nn.Linear(dk, int(dk / heads), bias=False)
         self.WV = torch.nn.Linear(dv, int(dv / heads), bias=False)
@@ -31,8 +30,7 @@ class SDPAttentionBlock(nn.Module):
         if masking:
             num_samples = keys.shape[0]
             mask = torch.tensor([[0 if i <= j else -1 * float("inf")
-                                for i in range(num_samples)] for j in range(num_samples)],
-                                dtype=torch.float32)
+                                for i in range(num_samples)] for j in range(num_samples)])
             y = mask + y
 
         z = F.softmax(y, 1)
@@ -64,8 +62,7 @@ def positional_encodings(dk, context_length=2048):
         coses = np.cos(angles)
         encoding = sins * even_mask + coses * (1-even_mask)
         encodings.append(encoding)
-
-    return torch.tensor(np.array(encodings))
+    return torch.tensor(np.array(encodings)).float()
 
 
 class EncoderBlock(nn.Module):
@@ -117,40 +114,51 @@ class DecoderBlock(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, num_blocks, dk, dv, hidden_dim, heads):
+    def __init__(self, num_blocks, dk, dv, hidden_dim, heads, vocab_size):
         super().__init__()
         self.blocks = [DecoderBlock(dk, dv, hidden_dim, heads)
                        for _ in range(num_blocks)]
+        self.output_layer = nn.Linear(dv, vocab_size)
 
     def forward(self, keys, queries, values, encoder_values):
         for block in self.blocks:
             out = block(keys, queries, values, encoder_values)
             keys, queries, values = out, out, out
-        return values
+        logits = self.output_layer(values)
+        return logits
 
 
 class Transformer(nn.Module):
-    def __init__(self, context_length, dmodel, vocab_size):
+    def __init__(self, context_length, dmodel, vocab_size, hidden_dim, heads, num_blocks=4):
         super().__init__()
+        self.context_length = context_length
         self.pos = positional_encodings(dmodel, context_length)
         self.embedding = nn.Embedding(vocab_size, dmodel)
+        self.encoder = Encoder(num_blocks, dmodel, dmodel, hidden_dim, heads)
+        self.decoder = Decoder(num_blocks, dmodel, dmodel, hidden_dim, heads, vocab_size)
 
+    def forward(self, input_sequence, output_sequence):
+        assert len(input_sequence) < self.context_length
+        assert len(output_sequence) < self.context_length
+        input_embeddings = self.embedding(input_sequence)
+        input_embeddings = input_embeddings + self.pos[0:input_embeddings.shape[0]]
+        encoded = self.encoder(input_embeddings, input_embeddings, input_embeddings)
+
+        output_embeddings = self.embedding(output_sequence)
+        output_embeddings = output_embeddings + self.pos[0:output_embeddings.shape[0]]
+        decoded = self.decoder(output_embeddings, output_embeddings, output_embeddings, encoded)
+        return decoded[-1]
 
 
 if __name__ == "__main__":
     torch.manual_seed(0)
-    dk = 128
-    dv = 128
+    torch.set_default_dtype(torch.float32)
+    dmodel = 128
     heads = 4
     hidden_dim = 2048
-    keys = torch.rand(10, dk)
-    queries = torch.rand(10, dk)
-    values = torch.rand(10, dv)
+    vocab_size = 10000
+    context_length = 512
 
-    block = EncoderBlock(dk, dv, hidden_dim, heads)
-    # out = block(keys, queries, values)
-
-    # block = NNBlock(dk, hidden_dim)
-    out = block(keys, queries, values)
-    out = positional_encodings(dk)
-    breakpoint()
+    model = Transformer(context_length, dmodel, vocab_size, hidden_dim, heads)
+    out = model(torch.tensor([10, 1223, 23, 345, 234]),
+                torch.tensor([10, 1223, 23, 345, 234, 2323, 232, 2321, 2313, 12]))
