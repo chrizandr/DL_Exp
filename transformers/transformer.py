@@ -11,7 +11,7 @@ class MultiHeadSDPAttentionBlock(nn.Module):
 
     def forward(self, keys, queries, values, masking=False):
         out = [x(keys, queries, values, masking) for x in self.attention_blocks]
-        out = torch.concat(out, 1)
+        out = torch.concat(out, 2) # B x N x (D/h) -> B x N x D
         return out
 
 
@@ -25,12 +25,13 @@ class SDPAttentionBlock(nn.Module):
     def forward(self, keys, queries, values, masking=False):
         Q_ = self.WQ(queries)
         K_ = self.WK(keys)
-        y = torch.matmul(Q_, K_.T) / np.sqrt(keys.shape[1])
+        K_ = K_.permute(0, 2, 1)
 
+        y = torch.bmm(Q_, K_) / np.sqrt(keys.shape[1])
         if masking:
-            num_samples = keys.shape[0]
+            num_tokens = keys.shape[1]
             mask = torch.tensor([[0 if i <= j else -1 * float("inf")
-                                for i in range(num_samples)] for j in range(num_samples)])
+                                for i in range(num_tokens)] for j in range(num_tokens)])
             y = mask + y
 
         z = F.softmax(y, 1)
@@ -141,13 +142,14 @@ class Transformer(nn.Module):
         assert len(input_sequence) < self.context_length
         assert len(output_sequence) < self.context_length
         input_embeddings = self.embedding(input_sequence)
-        input_embeddings = input_embeddings + self.pos[0:input_embeddings.shape[0]]
+        input_embeddings = input_embeddings + self.pos[0:input_embeddings.shape[1]]   # batching is forced
         encoded = self.encoder(input_embeddings, input_embeddings, input_embeddings)
 
         output_embeddings = self.embedding(output_sequence)
-        output_embeddings = output_embeddings + self.pos[0:output_embeddings.shape[0]]
+        output_embeddings = output_embeddings + self.pos[0:output_embeddings.shape[1]] # batching is forced
         decoded = self.decoder(output_embeddings, output_embeddings, output_embeddings, encoded)
-        return decoded[-1]
+
+        return decoded[:, -1, ::]   # B x N x D --> B x D (last element in each sequence of batch)
 
 
 if __name__ == "__main__":
@@ -160,5 +162,5 @@ if __name__ == "__main__":
     context_length = 512
 
     model = Transformer(context_length, dmodel, vocab_size, hidden_dim, heads)
-    out = model(torch.tensor([10, 1223, 23, 345, 234]),
-                torch.tensor([10, 1223, 23, 345, 234, 2323, 232, 2321, 2313, 12]))
+    out = model(torch.tensor([[10, 1223, 23, 345, 234], [10, 1223, 23, 345, 234]]),
+                torch.tensor([[10, 1223, 23, 345, 234, 2323, 232, 2321, 2313, 12], [10, 1223, 23, 345, 234, 2323, 232, 2321, 2313, 12]]))
