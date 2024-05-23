@@ -1,3 +1,10 @@
+"""
+Vanilla PyTorch Implementation of 'Train Short, Test Long: Attention with Linear Biases enables Input Length Extrapolation'
+https://arxiv.org/pdf/2108.12409
+
+Author: chrizandr
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

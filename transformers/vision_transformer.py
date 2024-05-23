@@ -1,3 +1,10 @@
+"""
+Vanilla PyTorch Implementation of 'An Image is Worth 16X16 Words: Transformers for Image Recognition at scale'
+https://arxiv.org/pdf/2010.11929
+
+Author: chrizandr
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

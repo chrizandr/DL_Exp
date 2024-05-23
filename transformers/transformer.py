@@ -1,3 +1,10 @@
+"""
+Vanilla PyTorch Implementation of 'Attention is All You Need'
+https://arxiv.org/pdf/1706.03762
+
+Author: chrizandr
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
