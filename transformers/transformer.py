@@ -29,9 +29,10 @@ class SDPAttentionBlock(nn.Module):
 
         y = torch.bmm(Q_, K_) / np.sqrt(keys.shape[1])
         if masking:
-            num_tokens = keys.shape[1]
+            key_shape = keys.shape[1]
+            queries_shape = queries.shape[1]
             mask = torch.tensor([[0 if i <= j else -1 * float("inf")
-                                for i in range(num_tokens)] for j in range(num_tokens)])
+                                for i in range(key_shape)] for j in range(queries_shape)])
             y = mask + y
 
         z = F.softmax(y, 1)
