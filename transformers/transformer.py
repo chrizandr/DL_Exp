@@ -118,8 +118,10 @@ class DecoderBlock(nn.Module):
 class Decoder(nn.Module):
     def __init__(self, num_blocks, dk, dv, hidden_dim, heads, vocab_size):
         super().__init__()
-        self.blocks = [DecoderBlock(dk, dv, hidden_dim, heads)
-                       for _ in range(num_blocks)]
+        self.blocks = [
+            DecoderBlock(dk, dv, hidden_dim, heads)
+            for _ in range(num_blocks)
+        ]
         self.output_layer = nn.Linear(dv, vocab_size)
 
     def forward(self, keys, queries, values, encoder_values):

@@ -41,8 +41,10 @@ class MultiHeadSDPAttentionBlock(nn.Module):
             dk, dv, heads) for i in range(heads)]
 
     def forward(self, keys, queries, values, masking=False):
-        out = [x(keys, queries, values, masking)
-               for x in self.attention_blocks]
+        out = [
+            x(keys, queries, values, masking)
+            for x in self.attention_blocks
+        ]
         out = torch.concat(out, 2)  # B x N x (D/h) -> B x N x D
         return out
 
@@ -117,8 +119,10 @@ class EncoderBlock(nn.Module):
 class Encoder(nn.Module):
     def __init__(self, num_blocks, dk, dv, hidden_dim, heads):
         super().__init__()
-        self.blocks = [EncoderBlock(dk, dv, hidden_dim, heads)
-                       for _ in range(num_blocks)]
+        self.blocks = [
+            EncoderBlock(dk, dv, hidden_dim, heads)
+            for _ in range(num_blocks)
+        ]
 
     def forward(self, keys, queries, values):
         for block in self.blocks:
