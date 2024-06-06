@@ -15,6 +15,8 @@ import torchvision.transforms as transforms
 from einops.layers.torch import Rearrange
 from torch.utils.data import Dataset
 import os
+from torch.utils.data import DataLoader
+
 
 
 class UNet(nn.Module):
@@ -260,6 +262,9 @@ class DiffusionDataset(Dataset):
             x_t = torch.normal(mean, std)
         return x_t
 
+    def __len__(self):
+        return len(self.img_files)
+
     def __getitem__(self, index):
         image = self.load_image(index)
         timestep = torch.tensor(np.random.choice(self.num_timesteps))
@@ -274,6 +279,8 @@ if __name__ == "__main__":
     res = torch.randn((2, 64, 64, 64))
     time_embedd = torch.randn((1, 1024))
     dataset = DiffusionDataset("/Users/chris/DL_Exp/diffusers/images", embedding_shape)
-    diffused_image, epsilon, time_embedding, timestep = dataset[0]
+    dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
+    data_iter = iter(dataloader)
+    diffused_image, epsilon, time_embedding, timestep = next(data_iter)
     model = UNet(embedding_shape)
-    out = model(diffused_image.unsqueeze(0), time_embedding.unsqueeze(0))
+    out = model(diffused_image, time_embedding)
