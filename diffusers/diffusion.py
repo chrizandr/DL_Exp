@@ -1,4 +1,11 @@
 
+"""
+Vanilla PyTorch Implementation of 'Denoising Diffusion Probabilistic Models'
+https://arxiv.org/pdf/2006.11239
+
+Author: chrizandr
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
