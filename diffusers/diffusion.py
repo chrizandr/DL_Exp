@@ -163,7 +163,7 @@ class MultiHeadAttention(nn.Module):
         super().__init__()
         self.attention_blocks = [Attention(
             dk, dv, heads) for i in range(heads)]
-        self.WO = torch.nn.Linear(dv, dv, bias=False)
+        self.WO = torch.nn.Linear(dv, dv, bias=True)
 
 
     def forward(self, keys, queries, values, masking=False):
