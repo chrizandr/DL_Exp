@@ -46,6 +46,8 @@ class MultiHeadSDPAttentionBlock(nn.Module):
         super().__init__()
         self.attention_blocks = [SDPAttentionBlock(
             dk, dv, heads) for i in range(heads)]
+        self.WO = torch.nn.Linear(dv, dv, bias=False)
+
 
     def forward(self, keys, queries, values, masking=False):
         out = [
@@ -53,6 +55,7 @@ class MultiHeadSDPAttentionBlock(nn.Module):
             for x in self.attention_blocks
         ]
         out = torch.concat(out, 2)  # B x N x (D/h) -> B x N x D
+        out = self.WO(out)
         return out
 
 

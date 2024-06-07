@@ -163,11 +163,14 @@ class MultiHeadAttention(nn.Module):
         super().__init__()
         self.attention_blocks = [Attention(
             dk, dv, heads) for i in range(heads)]
+        self.WO = torch.nn.Linear(dv, dv, bias=False)
+
 
     def forward(self, keys, queries, values, masking=False):
         out = [x(keys, queries, values, masking)
                for x in self.attention_blocks]
         out = torch.concat(out, 2)  # B x N x (D/h) -> B x N x D
+        out = self.WO(out)
         return out
 
 
@@ -283,4 +286,4 @@ if __name__ == "__main__":
     data_iter = iter(dataloader)
     diffused_image, epsilon, time_embedding, timestep = next(data_iter)
     model = UNet(embedding_shape)
-    out = model(diffused_image, time_embedding)
+    breakpoint()

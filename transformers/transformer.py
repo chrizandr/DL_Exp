@@ -15,10 +15,12 @@ class MultiHeadSDPAttentionBlock(nn.Module):
     def __init__(self, heads, dk, dv):
         super().__init__()
         self.attention_blocks = [SDPAttentionBlock(dk, dv, heads) for i in range(heads)]
+        self.WO = torch.nn.Linear(dv, dv, bias=False)
 
     def forward(self, keys, queries, values, masking=False):
         out = [x(keys, queries, values, masking) for x in self.attention_blocks]
         out = torch.concat(out, 2) # B x N x (D/h) -> B x N x D
+        out = self.WO(out)
         return out
 
 
@@ -28,6 +30,7 @@ class SDPAttentionBlock(nn.Module):
         self.WQ = torch.nn.Linear(dk, int(dk / heads), bias=False)
         self.WK = torch.nn.Linear(dk, int(dk / heads), bias=False)
         self.WV = torch.nn.Linear(dv, int(dv / heads), bias=False)
+
 
     def forward(self, keys, queries, values, masking=False):
         Q_ = self.WQ(queries)
@@ -174,3 +177,4 @@ if __name__ == "__main__":
     model = Transformer(context_length, dmodel, vocab_size, hidden_dim, heads)
     out = model(torch.tensor([[10, 1223, 23, 345, 234], [10, 1223, 23, 345, 234]]),
                 torch.tensor([[10, 1223, 23, 345, 234, 2323, 232, 2321, 2313, 12], [10, 1223, 23, 345, 234, 2323, 232, 2321, 2313, 12]]))
+    breakpoint()
