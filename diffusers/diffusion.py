@@ -69,6 +69,18 @@ class UNet(nn.Module):
         out = self.final_conv(out)
         return out
 
+    def sample(self, noise, timesteps, alpha, alpha_bar):
+        with torch.no_grad():
+            out = noise.clone().detach()
+            for i in range(timesteps):
+                step = timesteps - i - 1
+                pred_noise = self.forward(out)
+                out = 1/alpha[step] * (out - (1-alpha[step])/torch.sqrt(1-alpha_bar[step]) * pred_noise) + \
+                    torch.sqrt(1-alpha[step]) * noise
+
+        return out
+
+
 class ResnetBlock(nn.Module):
     def __init__(self, in_size=3, out_size=64):
         super().__init__()
@@ -168,7 +180,7 @@ class MultiHeadAttention(nn.Module):
 
     def forward(self, keys, queries, values, masking=False):
         out = [x(keys, queries, values, masking)
-               for x in self.attention_blocks]
+                for x in self.attention_blocks]
         out = torch.concat(out, 2)  # B x N x (D/h) -> B x N x D
         out = self.WO(out)
         return out
