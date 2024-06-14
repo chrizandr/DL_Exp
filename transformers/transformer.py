@@ -143,12 +143,12 @@ class Decoder(nn.Module):
 
 
 class Transformer(nn.Module):
-    def __init__(self, context_length, dmodel, vocab_size, hidden_dim, heads, num_blocks=4):
+    def __init__(self, context_length, dmodel, input_vocab_size, output_vocab_size, hidden_dim, heads, num_blocks=4):
         super().__init__()
         self.context_length = context_length
         self.pos = positional_encodings(dmodel, context_length)
-        self.input_embedding = nn.Embedding(vocab_size, dmodel)
-        self.output_embedding = nn.Embedding(vocab_size, dmodel)
+        self.input_embedding = nn.Embedding(input_vocab_size, dmodel)
+        self.output_embedding = nn.Embedding(output_vocab_size, dmodel)
         self.encoder = Encoder(num_blocks, dmodel, dmodel, hidden_dim, heads)
         self.decoder = Decoder(num_blocks, dmodel, dmodel, hidden_dim, heads, vocab_size)
 
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     vocab_size = 10000
     context_length = 512
 
-    model = Transformer(context_length, dmodel, vocab_size, hidden_dim, heads)
+    model = Transformer(context_length, dmodel, vocab_size, vocab_size, hidden_dim, heads)
     out = model(torch.tensor([[10, 1223, 23, 345, 234], [10, 1223, 23, 345, 234]]),
                 torch.tensor([[10, 1223, 23, 345, 234, 2323, 232, 2321, 2313, 12], [10, 1223, 23, 345, 234, 2323, 232, 2321, 2313, 12]]))
     breakpoint()
