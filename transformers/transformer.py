@@ -147,18 +147,19 @@ class Transformer(nn.Module):
         super().__init__()
         self.context_length = context_length
         self.pos = positional_encodings(dmodel, context_length)
-        self.embedding = nn.Embedding(vocab_size, dmodel)
+        self.input_embedding = nn.Embedding(vocab_size, dmodel)
+        self.output_embedding = nn.Embedding(vocab_size, dmodel)
         self.encoder = Encoder(num_blocks, dmodel, dmodel, hidden_dim, heads)
         self.decoder = Decoder(num_blocks, dmodel, dmodel, hidden_dim, heads, vocab_size)
 
     def forward(self, input_sequence, output_sequence):
         assert len(input_sequence) < self.context_length
         assert len(output_sequence) < self.context_length
-        input_embeddings = self.embedding(input_sequence)
+        input_embeddings = self.input_embedding(input_sequence)
         input_embeddings = input_embeddings + self.pos[0:input_embeddings.shape[1]]   # batching is forced
         encoded = self.encoder(input_embeddings, input_embeddings, input_embeddings)
 
-        output_embeddings = self.embedding(output_sequence)
+        output_embeddings = self.output_embedding(output_sequence)
         output_embeddings = output_embeddings + self.pos[0:output_embeddings.shape[1]] # batching is forced
         decoded = self.decoder(output_embeddings, output_embeddings, output_embeddings, encoded)
 
