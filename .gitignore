@@ -3,6 +3,8 @@ datasets/*
 tiny-dnn/*
 tiny-dnn*
 
+*/.DS_Store
+*.DS_Store
 *.pkl
 
 *data*
