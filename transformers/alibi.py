@@ -48,7 +48,7 @@ class ALiBiBlock(nn.Module):
         bias = torch.tensor(
             [[-1*(j-i) if i <= j else 0for i in range(key_shape)]
             for j in range(queries_shape)])
-        y = (torch.bmm(Q_, K_) + bias) / np.sqrt(keys.shape[1])
+        y = (torch.bmm(Q_, K_) + bias) / np.sqrt(K_.shape[1])
 
         if masking:
             mask = torch.tensor([[0 if i <= j else -1 * float("inf")

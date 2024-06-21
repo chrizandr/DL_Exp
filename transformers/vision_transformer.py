@@ -71,7 +71,7 @@ class SDPAttentionBlock(nn.Module):
         K_ = self.WK(keys)
         K_ = K_.permute(0, 2, 1)
 
-        y = torch.bmm(Q_, K_) / np.sqrt(keys.shape[1])
+        y = torch.bmm(Q_, K_) / np.sqrt(K_.shape[1])
         if masking:
             num_tokens = keys.shape[1]
             mask = torch.tensor([[0 if i <= j else -1 * float("inf")

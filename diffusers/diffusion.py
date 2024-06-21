@@ -198,7 +198,7 @@ class Attention(nn.Module):
         K_ = self.WK(keys)
         K_ = K_.permute(0, 2, 1)
 
-        y = torch.bmm(Q_, K_) / np.sqrt(keys.shape[1])
+        y = torch.bmm(Q_, K_) / np.sqrt(K_.shape[1])
         if masking:
             key_shape = keys.shape[1]
             queries_shape = queries.shape[1]
